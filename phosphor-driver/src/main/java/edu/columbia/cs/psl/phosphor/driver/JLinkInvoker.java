@@ -26,7 +26,9 @@ public final class JLinkInvoker {
         command.add("-J--add-reads=" + JLinkRegistrationAgent.MODULE_NAME + "=ALL-UNNAMED");
         command.add("-J--module-path=" + jlinkAgentJar);
         command.add("-J--add-modules=" + JLinkRegistrationAgent.MODULE_NAME);
-        command.add(getPluginOption(javaHome, instrumentation, options));
+        String pluginOption = getPluginOption(javaHome, instrumentation, options);
+        command.add(pluginOption);
+        command.add(pluginOption.replace("-instrument=", "-pre-gen-instrument="));
         command.add("--output=" + outputDirectory.getAbsolutePath());
         command.add("--add-modules");
         command.add(processModules(modules));

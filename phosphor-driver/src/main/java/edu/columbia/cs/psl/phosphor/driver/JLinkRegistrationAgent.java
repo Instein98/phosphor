@@ -235,7 +235,10 @@ public final class JLinkRegistrationAgent {
                 Collections.emptyMap());
         Class<?> jlinkPluginClass = jlinkModule.getClassLoader().loadClass(JLINK_PLUGIN_CLASS_NAME);
         Map<Class<?>, List<Class<?>>> extraProvides = new HashMap<>();
-        extraProvides.put(jlinkPluginClass, Collections.singletonList(InstrumentJLinkPlugin.class));
+        List<Class<?>> pluginClasses = new ArrayList<>();
+        pluginClasses.add(InstrumentJLinkPlugin.class);
+        pluginClasses.add(InstrumentPreGenJLinkPlugin.class);
+        extraProvides.put(jlinkPluginClass, pluginClasses);
         // Alter our custom JLink plugin's module to provide our custom JLink plugin as a service
         inst.redefineModule(
                 customPluginModule,
