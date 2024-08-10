@@ -1,5 +1,7 @@
 package edu.columbia.cs.psl.phosphor.agent;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,9 +25,7 @@ public class PhosphorPatcher {
             }
         }
         InstrumentUtil.deleteFile(archive);
-        if (!temp.renameTo(archive)) {
-            throw new IOException("Failed to move patched JAR: " + temp);
-        }
+        Files.move(temp.toPath(), archive.toPath(), REPLACE_EXISTING);
     }
 
     private static byte[] patch(String name, byte[] classFileBuffer) {
