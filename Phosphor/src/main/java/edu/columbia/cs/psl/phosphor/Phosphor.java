@@ -30,9 +30,7 @@ public final class Phosphor {
         if (System.getProperty("phosphorCacheDirectory") != null) {
             CACHE = TransformationCache.getInstance(System.getProperty("phosphorCacheDirectory"));
         }
-        // Ensure that BasicSourceSinkManager and anything needed to call isSourceOrSinkOrTaintThrough gets initialized
-        BasicSourceSinkManager.loadTaintMethods();
-        BasicSourceSinkManager.getInstance().isSourceOrSinkOrTaintThrough(Object.class);
+        BasicSourceSinkManager.init();
         instrumentation.addTransformer(new PCLoggingTransformer());
         instrumentation.addTransformer(new SourceSinkTransformer(), true);
     }

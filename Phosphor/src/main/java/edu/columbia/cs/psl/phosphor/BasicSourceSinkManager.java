@@ -7,6 +7,8 @@ import edu.columbia.cs.psl.phosphor.struct.harmony.util.*;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
 
@@ -107,6 +109,46 @@ public class BasicSourceSinkManager extends SourceSinkManager {
             String[] parsed = str.split("\\.");
             String baseSink = findSuperTypeAutoTaintProvider(parsed[0], parsed[1], sinks, inheritedSinks);
             return baseSink == null ? null : String.format("%s.%s", baseSink, parsed[1]);
+        }
+    }
+
+    /* Updates the FileInputStream of souces/sinks/taintThrough files based on the values of
+     * corresponding system properties and initializes anything needed to call
+     * isSourceOrSinkOrTaintThrough. */
+    public static synchronized void init(){
+        // Update the taint methods from system properties if they are not already specified in the java agent options.
+        updateInputStreamsBySysProperties();
+        // Ensure that BasicSourceSinkManager and anything needed to call isSourceOrSinkOrTaintThrough gets initialized
+        loadTaintMethods();
+        getInstance().isSourceOrSinkOrTaintThrough(Object.class);
+    }
+
+    /* Updates the sourcesFile, sinksFile and taintThroughFile based on the values of the system
+     * properties if they are not already specified in the java agent options. This method is added
+     * to provide more flexibility in specifying the auto-taint methods, allowing applications to
+     * specify such methods in additional jvm options, as the java_runtime_11_phosphor config have
+     * hardcoded the '-javaagent' jvm option. For example, `-Dphosphor.taintSourcesFile=/path/to/file`.*/
+    public static synchronized void updateInputStreamsBySysProperties() {
+        if (sourcesFile == null && System.getProperty("phosphor.taintSourcesFile") != null){
+            try {
+                sourcesFile = new FileInputStream(System.getProperty("phosphor.taintSourcesFile"));
+            } catch(FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        if (sinksFile == null && System.getProperty("phosphor.taintSinksFile") != null){
+            try {
+                sinksFile = new FileInputStream(System.getProperty("phosphor.taintSinksFile"));
+            } catch(FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        if (taintThroughFile == null && System.getProperty("phosphor.taintThroughFile") != null){
+            try {
+                taintThroughFile = new FileInputStream(System.getProperty("phosphor.taintThroughFile"));
+            } catch(FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
