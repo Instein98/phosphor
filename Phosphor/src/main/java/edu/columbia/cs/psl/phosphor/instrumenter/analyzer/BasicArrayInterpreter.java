@@ -174,7 +174,7 @@ public class BasicArrayInterpreter extends BasicInterpreter {
                         throw new IllegalArgumentException();
                 }
             }
-        } else if(type.equals("Lnull;")) {
+        } else if(type.toString().equals("Lnull;")) {
             return BasicArrayValue.NULL_VALUE;
         } else if(Configuration.IMPLICIT_EXCEPTION_FLOW && (type.getDescriptor().contains("Error") || type.getDescriptor().contains("Exception"))) {
             return new BasicArrayValue(type);
