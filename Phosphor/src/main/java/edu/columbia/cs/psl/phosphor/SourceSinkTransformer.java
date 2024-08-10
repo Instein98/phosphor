@@ -37,14 +37,20 @@ public class SourceSinkTransformer extends PhosphorBaseTransformer {
             if (Phosphor.DEBUG || TaintUtils.VERIFY_CLASS_GENERATION) {
                 cv = new CheckClassAdapter(cw, false);
             }
-            PrintWriter pw = new PrintWriter(new File("lastClass-sourceSink.txt"));
-            TraceClassVisitor debug = new TraceClassVisitor(cv, pw);
-            cv = debug;
+            PrintWriter pw = null;
+            TraceClassVisitor debug = null;
+            if (Phosphor.DEBUG){
+                pw = new PrintWriter(new File("lastClass-sourceSink.txt"));
+                debug = new TraceClassVisitor(cv, pw);
+                cv = debug;
+            }
             try {
                 cr.accept(new SourceSinkTaintingClassVisitor(cv), ClassReader.EXPAND_FRAMES);
             } finally {
-                debug.p.print(pw);
-                pw.close();
+                if (debug != null && pw != null){
+                    debug.p.print(pw);
+                    pw.close();
+                }
             }
             if (Phosphor.DEBUG) {
                 try {
@@ -59,6 +65,7 @@ public class SourceSinkTransformer extends PhosphorBaseTransformer {
             }
             return cw.toByteArray();
         } catch(FileNotFoundException ex) {
+            ex.printStackTrace();
             return null;
         } catch(Throwable t) {
             //If we don't try/catch and print the error, then it will be silently swallowed by the JVM
